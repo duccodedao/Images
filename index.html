@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .swiper-container {
+      width: 100%;
+      max-width: 600px;
+      margin: 20px auto;
+      position: relative;
+    }
+
+    .swiper-slide {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .swiper-slide img {
+      width: 100%;
+      max-height: 300px;
+      object-fit: cover;
+      border-radius: 8px;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .swiper-slide:hover img {
+      transform: scale(1);
+    }
+
+    .product-info {
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .product-info p {
+      margin: 5px 0;
+    }
+
+    .form-container {
+      width: 100%;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    label {
+      margin-bottom: 8px;
+    }
+
+    input {
+      padding: 8px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 10px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .selected-image {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .selected-image img {
+      width: 100%;
+      max-height: 300px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .success-message {
+      display: none;
+      background-color: #4caf50;
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+      border-radius: 4px;
+      margin-top: 20px;
+    }
+
+    .confirmation-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .confirmation-modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      position: relative;
+    }
+
+    .confirmation-modal img {
+      width: 100px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .confirmation-modal p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+
+    .total-amount {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+  <title>Đặt Hàng</title>
+</head>
+
+<body>
+  <div class="container" id="container">
+    <div class="swiper-container">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide" data-product-name="Áo 1" data-product-price="99,999 VND">
+          <img src="https://raw.githubusercontent.com/duccodedao/CardProfile/main/images/logo1.jpg" alt="Ảnh mặt hàng">
+          <div class="product-info">
+            <p class="name">Tên mặt hàng: Áo 1</p>
+            <p class="price">Giá: 99,999 VND</p>
+          </div>
+        </div>
+      </div>
+      <div class="swiper-pagination"></div>
+      <div class="swiper-button-next"></div>
+      <div class="swiper-button-prev"></div>
+    </div>
+
+    <div class="form-container">
+      <form id="orderForm">
+        <h1>Thông tin đặt hàng</h1>
+        <label for="fullName">Họ và Tên:</label>
+        <input type="text" id="fullName" name="fullName" required>
+
+        <label for="phoneNumber">Số Điện Thoại:</label>
+        <input type="tel" id="phoneNumber" name="phoneNumber" required>
+
+        <label for="address">Địa Chỉ:</label>
+        <input type="text" id="address" name="address" required>
+
+        <label for="quantity">Số Lượng:</label>
+        <input type="number" id="quantity" name="quantity" value="1" required>
+
+        <button type="button" onclick="showConfirmationModal()">Đặt Hàng</button>
+      </form>
+    </div>
+
+    <div class="selected-image" id="selectedImage">
+      <h2>Mặt hàng đã chọn</h2>
+      <img src="https://raw.githubusercontent.com/duccodedao/CardProfile/main/images/logo1.jpg" alt="Mặt hàng đã chọn">
+    </div>
+
+    <div class="success-message" id="successMessage">
+      <p>Đặt hàng thành công!</p>
+    </div>
+
+    <div class="confirmation-modal" id="confirmationModal">
+      <div class="confirmation-modal-content">
+        <img src="https://raw.githubusercontent.com/duccodedao/CardProfile/main/images/logo1.jpg" alt="Xác nhận mặt hàng thanh toán">
+        <p id="selectedProductName"></p>
+        <p id="totalAmount"></p>
+        <p id="shippingFee"></p>
+        <p class="total-amount" id="totalPayment"></p>
+        <p id="customerName"></p>
+        <p id="customerAddress"></p>
+        <p id="customerPhoneNumber"></p>
+        <button onclick="sendOrder()">Xác Nhận</button>
+        <button onclick="hideConfirmationModal()">Huỷ</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script>
+    var swiper = new Swiper('.swiper-container', {
+      slidesPerView: 1,
+      spaceBetween: 10,
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+      },
+    });
+
+    swiper.on('slideChangeTransitionEnd', function () {
+      var selectedImg = document.getElementById('selectedImage');
+      var activeSlide = swiper.slides[swiper.activeIndex];
+      var activeImg = activeSlide.querySelector('img');
+
+      selectedImg.querySelector('img').src = activeImg.src;
+    });
+
+    function showConfirmationModal() {
+      var confirmationModal = document.getElementById('confirmationModal');
+      var selectedProductName = document.getElementById('selectedProductName');
+      var totalAmount = document.getElementById('totalAmount');
+      var shippingFee = document.getElementById('shippingFee');
+      var totalPayment = document.getElementById('totalPayment');
+      var customerName = document.getElementById('customerName');
+      var customerAddress = document.getElementById('customerAddress');
+      var customerPhoneNumber = document.getElementById('customerPhoneNumber');
+      var quantity = document.getElementById('quantity');
+
+      var selectedSlide = swiper.slides[swiper.activeIndex];
+      var orderForm = document.getElementById('orderForm');
+      var productPrice = parseFloat(selectedSlide.getAttribute('data-product-price').replace(',', ''));
+      var shippingFeeAmount = 20000;
+      var totalAmountValue = productPrice * quantity.value;
+      var totalPaymentValue = totalAmountValue + shippingFeeAmount;
+
+      selectedProductName.textContent = selectedSlide.getAttribute('data-product-name');
+      totalAmount.textContent = 'Tiền hàng: ' + formatCurrency(totalAmountValue);
+      shippingFee.textContent = 'Phí vận chuyển: ' + formatCurrency(shippingFeeAmount);
+      totalPayment.textContent = 'Tổng thanh toán: ' + formatCurrency(totalPaymentValue);
+      customerName.textContent = 'Tên khách hàng: ' + orderForm.fullName.value;
+      customerAddress.textContent = 'Địa chỉ: ' + orderForm.address.value;
+      customerPhoneNumber.textContent = 'Số điện thoại: ' + orderForm.phoneNumber.value;
+
+      confirmationModal.style.display = 'flex';
+    }
+
+    function hideConfirmationModal() {
+      var confirmationModal = document.getElementById('confirmationModal');
+      confirmationModal.style.display = 'none';
+    }
+
+    function sendOrder() {
+      console.log('Product Name:', document.getElementById('selectedProductName').textContent);
+      console.log('Total Amount:', document.getElementById('totalAmount').textContent);
+      console.log('Shipping Fee:', document.getElementById('shippingFee').textContent);
+      console.log('Total Payment:', document.getElementById('totalPayment').textContent);
+      console.log('Customer Name:', document.getElementById('customerName').textContent);
+      console.log('Customer Address:', document.getElementById('customerAddress').textContent);
+      console.log('Customer Phone Number:', document.getElementById('customerPhoneNumber').textContent);
+
+      hideConfirmationModal();
+
+      var successMessage = document.getElementById('successMessage');
+      successMessage.style.display = 'block';
+
+      clearSelectedImage();
+      resetForm();
+    }
+
+    function clearSelectedImage() {
+      var selectedImage = document.getElementById('selectedImage');
+      selectedImage.style.display = 'none';
+    }
+
+    function resetForm() {
+      var orderForm = document.getElementById('orderForm');
+      orderForm.reset();
+    }
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+    }
+function sendToTelegram(orderInfo) {
+    const telegramBotToken = '6525730844:AAGj15TJV59qozfV6vZZD8Cmr85hHc8-Lcc';
+    const chatId = '-1002042330395'; // Bạn có thể lấy chat ID bằng cách gửi tin nhắn cho bot tạo ra
+
+    const message = `
+      🛒 **Đơn Hàng Mới**
+      📦 *Tên mặt hàng: ${orderInfo.productName}*
+      💵 *${orderInfo.totalAmount}*
+      🚚 *${orderInfo.shippingFee}*
+      👤 *${orderInfo.customerName}*
+      📍 *${orderInfo.customerAddress}*
+      📱 *${orderInfo.customerPhoneNumber}*
+      🕒 *Ngày, giờ đặt hàng: ${new Date().toLocaleString('vi-VN')}*
+
+    `;
+
+    const apiUrl = `https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
+
+    fetch(apiUrl, { method: 'GET' })
+      .then(response => response.json())
+      .then(data => console.log(data))
+      .catch(error => console.error('Error sending message to Telegram:', error));
+  }
+
+  function sendOrder() {
+    // Lấy thông tin đặt hàng từ các trường trong confirmation modal
+    const orderInfo = {
+      productName: document.getElementById('selectedProductName').textContent,
+      totalAmount: document.getElementById('totalAmount').textContent,
+      shippingFee: document.getElementById('shippingFee').textContent,
+      customerName: document.getElementById('customerName').textContent,
+      customerAddress: document.getElementById('customerAddress').textContent,
+      customerPhoneNumber: document.getElementById('customerPhoneNumber').textContent,
+    };
+
+    // Gọi hàm gửi thông tin đặt hàng qua Telegram
+    sendToTelegram(orderInfo);
+    
+    // Tiếp tục xử lý sau khi gửi thông tin thành công
+    hideConfirmationModal();
+    var successMessage = document.getElementById('successMessage');
+    successMessage.style.display = 'block';
+    clearSelectedImage();
+    resetForm();
+  }
+
+
+
+
+
+  </script>
+</body>
+
+</html>
